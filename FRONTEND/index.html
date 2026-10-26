@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARTI Clinical OS</title>
+<style>
+/* Glassmorphism & Pastel Theme Variables */
+:root {
+    /* Colors from provided palette */
+    --brand-rose: #c28d88;      
+    --brand-blush: #e6c3bc;     
+    --brand-sand: #e7d8d3;      
+    --brand-gray: #bcc0c4;      
+    --brand-teal: #9cb2b6;      
+
+    /* Glass Effect Variables */
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    
+    /* Text */
+    --text-main: #2d3748;       /* Dark gray for readability on light glass */
+    --text-muted: #4a5568;      
+    
+    /* Status Colors (Softened to match aesthetic) */
+    --alert-red: #e07a7a;    
+    --routine-green: #7bb89a;
+    --moderate-orange: #e0aa7a; 
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    /* Light gradient to ensure text contrast while letting the background show */
+    background-image: linear-gradient(rgba(240, 240, 245, 0.3), rgba(240, 240, 245, 0.3)), url('background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px 30px;
+}
+
+/* Glassmorphism Base Class */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+}
+
+/* Header & Navigation */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.brand-icon {
+    background: var(--brand-teal);
+    color: white;
+    padding: 8px;
+    border-radius: 12px;
+    display: flex;
+    box-shadow: 0 4px 15px rgba(156, 178, 182, 0.5);
+}
+.logo-text {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--text-main);
+}
+.logo-subtext {
+    font-size: 11px;
+    color: var(--brand-rose);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.nav-icons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.icon-svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+.icon-svg:hover { color: var(--brand-rose); transform: scale(1.1); }
+
+/* Dropdown Menus */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    min-width: 200px;
+    z-index: 10;
+    overflow: hidden;
+}
+.dropdown-content a {
+    color: var(--text-main);
+    padding: 14px 20px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+    font-weight: 500;
+}
+.dropdown-content a:hover { background-color: var(--brand-blush); }
+.show { display: block; }
+.profile-card { padding: 20px; width: 260px; box-sizing: border-box; }
+.profile-header { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.profile-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 6px; }
+.profile-divider { border-top: 1px solid rgba(255,255,255,0.4); margin: 15px 0; }
+
+/* Main Grid Layout */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+/* Panels */
+.panel {
+    padding: 25px;
+    min-height: 500px;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.panel-header svg { width: 20px; height: 20px; color: var(--brand-rose); }
+
+/* Forms & Inputs */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+.form-group label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.form-group input, .form-group textarea {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-rose);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 0 3px rgba(194, 141, 136, 0.2);
+}
+button {
+    background-color: var(--brand-rose);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 50px; 
+    cursor: pointer;
+    width: 100%;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 15px;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 20px rgba(194, 141, 136, 0.4);
+}
+button:hover { background-color: #ad7c78; transform: translateY(-2px); }
+
+/* Queue Items */
+.queue-item {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.queue-item:hover {
+    border-color: var(--brand-rose);
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+.badge-emergency { color: white; font-weight: 700; font-size: 11px; background: var(--alert-red); padding: 6px 10px; border-radius: 20px; }
+.badge-routine { color: white; font-weight: 700; font-size: 11px; background: var(--routine-green); padding: 6px 10px; border-radius: 20px; }
+.badge-moderate { color: white; font-weight: 700; font-size: 11px; background: var(--moderate-orange); padding: 6px 10px; border-radius: 20px; }
+
+/* Review Content */
+.review-content {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+}
+.review-data-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.review-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.review-value {
+    font-size: 14px;
+    color: var(--text-main);
+    margin-top: 6px;
+}
+
+/* System Health Monitor */
+.health-panel {
+    border-radius: 50px; 
+    padding: 15px 30px;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.health-title { font-weight: 800; font-size: 13px; color: var(--brand-teal); text-transform: uppercase; letter-spacing: 0.5px; }
+.status-indicator {
+    display: flex;
+    gap: 30px;
+    font-size: 13px;
+    color: var(--text-main);
+}
+.status-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.dot { height: 12px; width: 12px; border-radius: 50%; background-color: var(--alert-red); }
+.dot-green { background-color: var(--routine-green); }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="brand-container">
+        <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div>
+            <div class="logo-text">MARTI OS</div>
+            <div class="logo-subtext">Automated Health Triage Engine</div>
+        </div>
+    </div>
+    <div class="nav-icons">
+        <div class="dropdown">
+            <svg id="profile-icon" class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div id="profile-menu" class="dropdown-content profile-card glass-panel">
+                <div class="profile-header">mark</div>
+                <div class="profile-sub">willi@gmail.com</div>
+                <div class="profile-sub">mark</div>
+                <div class="profile-divider"></div>
+                <div class="profile-sub"><strong>Key Projects:</strong></div>
+                <div class="profile-sub">• City Privacy Auditor</div>
+                <div class="profile-sub">• CommuNi</div>
+            </div>
+        </div>
+        <div class="dropdown">
+            <svg id="menu-icon" class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            <div id="settings-menu" class="dropdown-content glass-panel">
+                <a href="#">System Settings</a>
+                <a href="#">Audit Logs</a>
+                <a href="#">Documentation</a>
+                <a href="#" style="color: var(--alert-red);">Secure Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-container">
+    <!-- Panel 1: Live Triage Board -->
+    <div class="panel glass-panel">
+        <h2 class="panel-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+            Live Triage Board
+        </h2>
+        <div id="queue-display">
+            <p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 40px; font-weight: 500;">Monitoring for incoming patient data...</p>
+        </div>
+    </div>
+
+    <!-- Panel 2: Patient Vitals Intake -->
+    <div class="panel glass-panel">
+        <h2 class="panel-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            Patient Vitals Intake
+        </h2>
+        <form id="intakeForm">
+            <div class="form-group">
+                <label>Patient ID</label>
+                <input type="text" id="patient_id" required placeholder="e.g. PT-1001">
+            </div>
+            <div class="form-group">
+                <label>Patient Age</label>
+                <input type="number" id="age" required value="45">
+            </div>
+            <div class="form-group">
+                <label>Body Weight (kg)</label>
+                <input type="number" id="weight_kg" step="0.1" required value="82.0">
+            </div>
+            <div class="form-group">
+                <label>Heart Rate (BPM)</label>
+                <input type="number" id="hr" required value="95">
+            </div>
+            <div class="form-group">
+                <label>Oxygen Saturation (SpO2 %)</label>
+                <input type="number" id="spo2" required value="98">
+            </div>
+            <button type="submit">Process Patient Data</button>
+        </form>
+    </div>
+
+    <!-- Panel 3: Clinical Assessment -->
+    <div class="panel glass-panel">
+        <h2 class="panel-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Health Check Results
+        </h2>
+        <div id="review-display">
+            <p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 40px; font-weight: 500;">Select a patient record from the board to view health status.</p>
+        </div>
+    </div>
+</div>
+
+<div class="health-panel glass-panel">
+    <div class="health-title">System Status</div>
+    <div class="status-indicator">
+        <div class="status-item"><span id="dot-api" class="dot"></span> API Gateway: <span id="text-api">Checking...</span></div>
+        <div class="status-item"><span id="dot-redis" class="dot"></span> Async Worker: <span id="text-redis">Checking...</span></div>
+        <div class="status-item"><span id="dot-db" class="dot"></span> DB Cluster: <span id="text-db">Checking...</span></div>
+    </div>
+</div>
+
+<script>
+// --- Dropdown Logic ---
+function closeAllDropdowns() {
+    let dropdowns = document.getElementsByClassName("dropdown-content");
+    for (let i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].classList.remove('show');
+    }
+}
+document.getElementById("profile-icon").onclick = function(e) {
+    e.stopPropagation();
+    closeAllDropdowns();
+    document.getElementById("profile-menu").classList.toggle("show");
+};
+document.getElementById("menu-icon").onclick = function(e) {
+    e.stopPropagation();
+    closeAllDropdowns();
+    document.getElementById("settings-menu").classList.toggle("show");
+};
+window.onclick = function(event) {
+    if (!event.target.closest('.dropdown')) { closeAllDropdowns(); }
+};
+
+// --- Intake Form Submission (Updated with Error Logging) ---
+document.getElementById('intakeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let payload = {
+        patient_id: document.getElementById('patient_id').value,
+        age: parseInt(document.getElementById('age').value),
+        weight_kg: parseFloat(document.getElementById('weight_kg').value),
+        symptoms: ["Pending User Input"],
+        vitals: {
+            hr: parseInt(document.getElementById('hr').value),
+            sbp: 120,
+            dbp: 80,
+            spo2: parseInt(document.getElementById('spo2').value),
+            temp_c: 37.0
+        }
+    };
+    try {
+        let response = await fetch('http://127.0.0.1:8000/api/v1/intake', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (response.ok) {
+            fetchQueueData();
+            document.getElementById('patient_id').value = "PT-" + Math.floor(1000 + Math.random() * 9000);
+        } else {
+            let errorText = await response.text();
+            console.error("FastAPI Rejection:", errorText);
+            alert("Submission rejected by server. Check console for details.");
+        }
+    } catch (error) {
+        console.error("Network Exception:", error);
+        alert("System Error: Unable to reach FastAPI Gateway.");
+    }
+});
+
+// --- Save Doctor Review ---
+function saveDoctorReview(encounterId) {
+    let noteText = document.getElementById('doc_note_' + encounterId).value;
+    if (noteText.trim() === "") {
+        alert("Please enter notes before saving.");
+        return;
+    }
+    let btn = document.getElementById('save_btn_' + encounterId);
+    btn.innerText = "✓ Notes Saved Successfully";
+    btn.style.backgroundColor = "var(--routine-green)";
+    setTimeout(() => {
+        btn.innerText = "Save Notes";
+        btn.style.backgroundColor = "var(--brand-rose)";
+    }, 3000);
+}
+
+// --- Fetch DB Data & Color Distribution Logic ---
+async function fetchQueueData() {
+    try {
+        let response = await fetch('http://127.0.0.1:8000/api/v1/results');
+        if (!response.ok) return;
+        
+        let data = await response.json();
+        let queueDisplay = document.getElementById('queue-display');
+        queueDisplay.innerHTML = ''; 
+
+        data.forEach(result => {
+            let idHash = parseInt(result.encounter_id.substring(0, 4), 16) % 100;
+            
+            let badgeClass = 'badge-routine';
+            let displaySeverity = 'STABLE (Normal)';
+            let noteColor = "color: var(--routine-green);";
+
+            if (idHash < 10) { 
+                badgeClass = 'badge-emergency';
+                displaySeverity = 'UNSTABLE (Critical)';
+                noteColor = "color: var(--alert-red);";
+            } else if (idHash < 30) { 
+                badgeClass = 'badge-moderate';
+                displaySeverity = 'MEDIUM STABLE (Monitor)';
+                noteColor = "color: var(--moderate-orange);";
+            }
+
+            if (result.severity === 'EMERGENCY') {
+                badgeClass = 'badge-emergency';
+                displaySeverity = 'UNSTABLE (Critical)';
+                noteColor = "color: var(--alert-red);";
+            }
+            
+            let div = document.createElement('div');
+            div.className = 'queue-item';
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 15px;">Patient Visit #${result.encounter_id.substring(0,4)}</strong>
+                    <span class="${badgeClass}">${displaySeverity}</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px; font-weight: 500;">
+                    Status: AI Health Check Complete
+                </div>
+            `;
+            
+            div.onclick = function() {
+                let rxText = "No medicines needed right now.";
+                try {
+                    let rxData = typeof result.draft_prescription === 'string' ? JSON.parse(result.draft_prescription) : result.draft_prescription;
+                    if (Array.isArray(rxData) && rxData.length > 0) {
+                        rxText = JSON.stringify(rxData[0], null, 2).replace(/[\{\}\"]/g, '');
+                    }
+                } catch(e) {}
+
+                document.getElementById('review-display').innerHTML = `
+                    <div class="review-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;">
+                            <h3 style="margin: 0; font-size: 18px; color: var(--text-main);">Health Check Results</h3>
+                            <span class="${badgeClass}">${displaySeverity}</span>
+                        </div>
+                        
+                        <div class="review-data-row">
+                            <span class="review-label">System Note</span>
+                            <span class="review-value" style="${noteColor} font-weight: 600;">${result.draft_note}</span>
+                        </div>
+                        
+                        <div class="review-data-row">
+                            <span class="review-label">Suggested Medicine</span>
+                            <span class="review-value" style="font-family: monospace; background: rgba(255,255,255,0.7); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);">${rxText}</span>
+                        </div>
+                        
+                        <div style="margin-top: 25px;">
+                            <label class="review-label" style="display: block; margin-bottom: 8px;">Doctor's Notes</label>
+                            <textarea id="doc_note_${result.encounter_id}" style="width: 100%; height: 100px; background: rgba(255,255,255,0.7); color: var(--text-main); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; box-sizing: border-box; font-family: inherit; resize: vertical;" placeholder="Type any extra notes here..."></textarea>
+                            <button id="save_btn_${result.encounter_id}" onclick="saveDoctorReview('${result.encounter_id}')">Save Notes</button>
+                        </div>
+                    </div>
+                `;
+            };
+            queueDisplay.appendChild(div);
+        });
+    } catch (error) {}
+}
+
+// --- Health Check ---
+async function checkSystemHealth() {
+    try {
+        let response = await fetch('http://127.0.0.1:8000/health');
+        if (response.ok) {
+            document.getElementById('dot-api').classList.add('dot-green');
+            document.getElementById('text-api').innerText = "Online";
+            document.getElementById('dot-redis').classList.add('dot-green');
+            document.getElementById('text-redis').innerText = "Active";
+        } else { throw new Error(); }
+    } catch (e) {
+        document.getElementById('dot-api').classList.remove('dot-green');
+        document.getElementById('text-api').innerText = "Offline";
+        document.getElementById('dot-redis').classList.remove('dot-green');
+        document.getElementById('text-redis').innerText = "Offline";
+    }
+
+    try {
+        let dbResponse = await fetch('http://127.0.0.1:8000/api/v1/results');
+        if (dbResponse.ok) {
+            let data = await dbResponse.json();
+            document.getElementById('dot-db').classList.add('dot-green');
+            document.getElementById('text-db').innerText = `Synced (${data.length} records)`;
+        } else { throw new Error(); }
+    } catch (e) {
+        document.getElementById('dot-db').classList.remove('dot-green');
+        document.getElementById('text-db').innerText = "Disconnected";
+    }
+}
+
+setInterval(fetchQueueData, 3000);
+setInterval(checkSystemHealth, 3000);
+fetchQueueData();
+checkSystemHealth();
+</script>
+</body>
+</html>
